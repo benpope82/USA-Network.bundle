@@ -56,7 +56,7 @@ def Episodes(show_id, show):
 			summary = episode['description'],
 			thumb = Resource.ContentsOfURLWithFallback(episode['images'][0]['images']['episode_banner']),
 			season = int(episode['seasonNumber']),
-			index = int(episode['episodeNumber']),
+			index = int(episode['episodeNumber']) if 'episodeNumber' in episode else None,
 			duration = episode['totalDuration'],
 			originally_available_at = Datetime.FromTimestamp(episode['firstAiredDate'])
 		))
