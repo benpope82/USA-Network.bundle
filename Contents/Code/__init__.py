@@ -24,8 +24,8 @@ def Shows():
 		show_id = show['assetID']
 		title = show['title']
 		summary = show['description']
-		thumb = show['images'][0]['images']['show_tile']
-
+		try: thumb = show['images'][0]['images']['show_tile']
+		except: thumb - none
 		oc.add(DirectoryObject(
 			key = Callback(Episodes, show_id=show_id, show=title),
 			title = title,
