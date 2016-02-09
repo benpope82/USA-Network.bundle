@@ -16,16 +16,19 @@ def Shows():
 	oc = ObjectContainer()
 
 	if not Client.Platform in ('Android', 'iOS', 'Roku', 'Safari', 'tvOS', 'Konvergo', 'Mystery 4'):
+
 		oc.header = 'Not supported'
 		oc.message = 'This channel is not supported on %s' % (Client.Platform if Client.Platform is not None else 'this client')
 		return oc
 
 	for show in JSON.ObjectFromURL(SHOWS_URL):
+
 		show_id = show['assetID']
 		title = show['title']
 		summary = show['description']
 		try: thumb = show['images'][0]['images']['show_tile']
-		except: thumb - none
+		except: thumb = ''
+
 		oc.add(DirectoryObject(
 			key = Callback(Episodes, show_id=show_id, show=title),
 			title = title,
