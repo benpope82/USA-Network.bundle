@@ -24,7 +24,7 @@ def MetadataObjectForURL(url):
 				title = episode['title'],
 				summary = episode['description'],
 				duration = episode['totalDuration'],
-				thumb = episode['images'][0]['images']['episode_banner'] if 'episode_banner' in episode['images'][0]['images'] else None,
+				thumb = episode['images'][0]['images']['episode_banner'] if 'episode_banner' in episode['images'][0]['images'] else '',
 				originally_available_at = Datetime.FromTimestamp(episode['firstAiredDate']).date()
 			)
 
