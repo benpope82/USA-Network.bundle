@@ -51,7 +51,7 @@ def Episodes(show_id, show):
 			show = show,
 			title = episode['title'],
 			summary = episode['description'],
-			thumb = Resource.ContentsOfURLWithFallback(episode['images'][0]['images']['episode_banner']),
+			thumb = Resource.ContentsOfURLWithFallback(episode['images'][0]['images']['episode_banner']) if 'episode_banner' in episode['images'][0]['images'] else None,
 			season = int(episode['seasonNumber']),
 			index = int(episode['episodeNumber']) if 'episodeNumber' in episode else None,
 			duration = episode['totalDuration'],
