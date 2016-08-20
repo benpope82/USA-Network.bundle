@@ -38,7 +38,7 @@ def MetadataObjectForURL(url):
 			found_episode = True
 			break
 
-	if not found_episode:
+	if not found_episode or episode['requiresAuth']:
 		raise Ex.MediaNotAvailable
 
 	if show and season and index and subtype == 'episode':
@@ -55,6 +55,7 @@ def MetadataObjectForURL(url):
 		)
 
 	else:
+
 		return VideoClipObject(
 			title = title,
 			summary = summary,
