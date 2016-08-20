@@ -9,24 +9,59 @@ def NormalizeURL(url):
 def MetadataObjectForURL(url):
 
 	(show_id, video_id) = url.split('://')[-1].split('/')
+
+	show = None
+	subtype = 'episode'
+	season = None
+	index = None
+
 	found_episode = False
 
 	for episode in JSON.ObjectFromURL(VIDEOS_URL % show_id)['results']:
 
 		if episode['assetID'].endswith(video_id):
 
-			return EpisodeObject(
-				show = episode['parentContainerTitle'],
-				season = int(episode['seasonNumber']) if 'seasonNumber' in episode else None,
-				index = int(episode['episodeNumber']) if 'episodeNumber' in episode else None,
-				title = episode['title'],
-				summary = episode['description'],
-				duration = episode['totalDuration'],
-				originally_available_at = Datetime.FromTimestamp(episode['firstAiredDate']).date(),
-				thumb = episode['images'][0]['images']['video_thumbnail_16_by_9'] if 'video_thumbnail_16_by_9' in episode['images'][0]['images'] else ''
-			)
+			show = episode['parentContainerTitle']
+			subtype = episode['subtype']
+			season = episode['seasonNumber'] if 'seasonNumber' in episode else None
+			index = episode['episodeNumber'] if 'episodeNumber' in episode else None
+			title = episode['title']
+			summary = episode['description']
+			duration = episode['totalDuration']
+			originally_available_at = Datetime.FromTimestamp(episode['firstAiredDate']).date()
 
-	raise Ex.MediaNotAvailable
+			try:
+				thumb = episode['images'][0]['images']['video_thumbnail_16_by_9']
+			except:
+				thumb = ''
+
+			found_episode = True
+			break
+
+	if not found_episode:
+		raise Ex.MediaNotAvailable
+
+	if show and season and index and subtype == 'episode':
+
+		return EpisodeObject(
+			show = show,
+			season = int(season),
+			index = int(index),
+			title = title,
+			summary = summary,
+			duration = duration,
+			thumb = Resource.ContentsOfURLWithFallback(thumb),
+			originally_available_at = originally_available_at
+		)
+
+	else:
+		return VideoClipObject(
+			title = title,
+			summary = summary,
+			duration = duration,
+			thumb = Resource.ContentsOfURLWithFallback(thumb),
+			originally_available_at = originally_available_at
+		)
 
 ####################################################################################################
 def MediaObjectsForURL(url):
