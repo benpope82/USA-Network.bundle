@@ -1,6 +1,4 @@
-EPISODES_URL = 'http://tve-atcnbce.nbcuni.com/live/3/usa/containers/%s/iPad?filterBy=episode'
-
-AudioStreamObject.language_code = Locale.Language.English
+VIDEOS_URL = 'http://tveatc-usa.nbcuni.com/awe3/live/5/usa/containers/iPadRetina/%s'
 
 ####################################################################################################
 def NormalizeURL(url):
@@ -10,22 +8,22 @@ def NormalizeURL(url):
 ####################################################################################################
 def MetadataObjectForURL(url):
 
-	(show_id, video_id) = url.split('#')[-1].split('|')
+	(show_id, video_id) = url.split('://')[-1].split('/')
 	found_episode = False
 
-	for episode in JSON.ObjectFromURL(EPISODES_URL % show_id)['results']:
+	for episode in JSON.ObjectFromURL(VIDEOS_URL % show_id)['results']:
 
 		if episode['assetID'].endswith(video_id):
 
 			return EpisodeObject(
 				show = episode['parentContainerTitle'],
-				season = int(episode['seasonNumber']),
-				index = int(episode['episodeNumber']),
+				season = int(episode['seasonNumber']) if 'seasonNumber' in episode else None,
+				index = int(episode['episodeNumber']) if 'episodeNumber' in episode else None,
 				title = episode['title'],
 				summary = episode['description'],
 				duration = episode['totalDuration'],
-				thumb = episode['images'][0]['images']['episode_banner'] if 'episode_banner' in episode['images'][0]['images'] else '',
-				originally_available_at = Datetime.FromTimestamp(episode['firstAiredDate']).date()
+				originally_available_at = Datetime.FromTimestamp(episode['firstAiredDate']).date(),
+				thumb = episode['images'][0]['images']['video_thumbnail_16_by_9'] if 'video_thumbnail_16_by_9' in episode['images'][0]['images'] else ''
 			)
 
 	raise Ex.MediaNotAvailable
@@ -41,7 +39,6 @@ def MediaObjectsForURL(url):
 				)
 			],
 			video_resolution = '720',
-			aspect_ratio = '1.78',
 			audio_channels = 2,
 			optimized_for_streaming = True
 		)
@@ -51,10 +48,10 @@ def MediaObjectsForURL(url):
 @indirect
 def PlayVideo(url):
 
-	(show_id, video_id) = url.split('#')[-1].split('|')
+	(show_id, video_id) = url.split('://')[-1].split('/')
 	found_episode = False
 
-	for episode in JSON.ObjectFromURL(EPISODES_URL % show_id)['results']:
+	for episode in JSON.ObjectFromURL(VIDEOS_URL % show_id)['results']:
 
 		if episode['assetID'].endswith(video_id):
 
