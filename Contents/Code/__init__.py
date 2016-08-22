@@ -21,8 +21,12 @@ def Shows():
 
 	for show in JSON.ObjectFromURL(SHOWS_URL)['results']:
 
-		show_id = show['assetID']
 		title = show['title']
+
+		if title.lower() in ['movies on usa']:
+			continue
+
+		show_id = show['assetID']
 		summary = show['description']
 		thumb = show['images'][0]['images']['show_thumbnail_16_by_9']
 
