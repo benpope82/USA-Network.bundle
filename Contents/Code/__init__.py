@@ -4,7 +4,7 @@ ICON = 'icon-default.jpg'
 
 SHOWS_URL = 'http://tveatc-usa.nbcuni.com/awe3/live/5/usa/containers/iPadRetina'
 SECTIONS_URL = 'http://tveatc-usa.nbcuni.com/awe3/live/5/usa/asset/iPadRetina/%s'
-VIDEOS_URL = 'http://tveatc-usa.nbcuni.com/awe3/live/5/usa/containers/iPadRetina/%s?seasonNumber=%s&filterBy=%s'
+VIDEOS_URL = 'http://tveatc-usa.nbcuni.com/awe3/live/5/usa/containers/iPadRetina/%s?seasonNumber=%s&filterBy=%s&requiresAuth=false'
 
 ####################################################################################################
 def Start():
@@ -48,18 +48,22 @@ def Sections(show_id, show):
 	json_obj = JSON.ObjectFromURL(SECTIONS_URL % (show_id))
 	thumb = json_obj['images'][0]['images']['show_thumbnail_16_by_9']
 
-	has_episodes = False
-	has_clips = False
+	total_episodes = 0
+	total_clips = 0
 
 	for season in json_obj['seasons']:
 
 		if season['hasEpisodes']:
-			has_episodes = True
+
+			json_obj = JSON.ObjectFromURL(VIDEOS_URL % (show_id, season['number'], 'episode'))
+			total_episodes += json_obj['metadata']['total']
 
 		if season['hasClips']:
-			has_clips = True
 
-	if has_episodes:
+			json_obj = JSON.ObjectFromURL(VIDEOS_URL % (show_id, season['number'], 'clip'))
+			total_clips += json_obj['metadata']['total']
+
+	if total_episodes > 0:
 
 		oc.add(DirectoryObject(
 			key = Callback(Seasons, show_id=show_id, show=show, filter_by='episode'),
@@ -67,7 +71,7 @@ def Sections(show_id, show):
 			thumb = Resource.ContentsOfURLWithFallback(thumb, fallback=ICON)
 		))
 
-	if has_clips:
+	if total_clips > 0:
 
 		oc.add(DirectoryObject(
 			key = Callback(Seasons, show_id=show_id, show=show, filter_by='clip'),
